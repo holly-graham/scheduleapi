@@ -2,25 +2,17 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/holly-graham/schedulecli/cli"
-	"github.com/holly-graham/schedulecli/db"
-	"github.com/holly-graham/schedulecli/schedule"
+	"github.com/gorilla/mux"
+	"github.com/holly-graham/scheduleapi/db"
+	"github.com/holly-graham/scheduleapi/schedule"
+	"github.com/holly-graham/scheduleapi/server"
 )
 
-const (
-	addActivityCmd  = "Add Activity"
-	viewScheduleCmd = "View Schedule"
-	backCmd         = "Back"
-	view            = "View Day"
-	addAnother      = "Add to Same Day"
-	mainMenu        = "Main Menu"
-	weekOverview    = "Week Overview"
-	dayOverview     = "Day Overview"
-	differentDay    = "Add to a Different Day"
-)
+const port = ":8000"
 
 func main() {
 	db, err := db.ConnectDatabase("activities_db.config")
@@ -31,8 +23,13 @@ func main() {
 
 	scheduleService := schedule.NewService(db)
 
-	cliMenu := cli.New(scheduleService)
+	router := mux.NewRouter()
+	router.HandleFunc("/day/{chosenDay}/activities", server.ListActivitiesHandler).Methods("GET")
+	router.HandleFunc("/days/{chosenDay}/activities", server.AddActivityHandler).Methods("POST")
 
-	cliMenu.MainMenu()
+	http.Handle("/", router)
+
+	fmt.Println("Waiting for requests on port:", port)
+	http.ListenAndServe(port, nil)
 
 }
