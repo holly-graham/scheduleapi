@@ -44,7 +44,7 @@ func (s *ScheduleServer) ListActivitiesHandler(rw http.ResponseWriter, r *http.R
 
 type CreateActivityRequest struct {
 	Time        string
-	Description int
+	Description string
 }
 
 func (s *ScheduleServer) AddActivityHandler(rw http.ResponseWriter, r *http.Request) {
@@ -58,13 +58,6 @@ func (s *ScheduleServer) AddActivityHandler(rw http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	newScheduleActivity := schedule.Activity{
-		Time:        newActivity.time,
-		Description: newActivity.description,
-	}
-
-	s.scheduleService.AddActivity(newScheduleActivity, chosenDay)
-
 	var newActivity CreateActivityRequest
 	err = json.Unmarshal(requestBody, &newActivity)
 	if err != nil {
@@ -72,6 +65,13 @@ func (s *ScheduleServer) AddActivityHandler(rw http.ResponseWriter, r *http.Requ
 		rw.WriteHeader(http.StatusBadRequest)
 		return
 	}
+
+	newScheduleActivity := schedule.Activity{
+		Time:        newActivity.Time,
+		Description: newActivity.Description,
+	}
+
+	s.scheduleService.AddActivity(newScheduleActivity, chosenDay)
 
 	err = s.scheduleService.AddActivity(newScheduleActivity, chosenDay)
 	if err != nil {
