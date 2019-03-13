@@ -27,7 +27,7 @@ func main() {
 
 	router := mux.NewRouter()
 	router.HandleFunc("/day/{chosenDay}/activities", scheduleServer.ListActivitiesHandler).Methods("GET")
-	router.HandleFunc("/days/{chosenDay}/activities", scheduleServer.AddActivityHandler).Methods("POST")
+	router.HandleFunc("/day/{chosenDay}/activities", scheduleServer.AddActivityHandler).Methods("POST")
 
 	http.Handle("/", router)
 
